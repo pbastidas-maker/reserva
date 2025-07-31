@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reserva de Servicios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      margin-top: 3rem;
+    }
+    h1 {
+      color: #3483fa;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    label {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    input[type=range], input[type=date] {
+      width: 100%;
+      margin: 1rem 0;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    .valor-seleccionado {
+      font-size: 1.5rem;
+      color: #3483fa;
+      font-weight: bold;
+      text-align: center;
+    }
+    .boton-confirmar, .boton-reset {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      background-color: #3483fa;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .boton-confirmar:hover, .boton-reset:hover {
+      background-color: #2968c8;
+    }
+    .mensaje-confirmacion {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background-color: #e6f0ff;
+      border-left: 4px solid #3483fa;
+      color: #333;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Reserva tu Servicio de Manoseo</h1>
+    <label for="fecha">Selecciona la fecha de tu reserva</label>
+    <input type="date" id="fecha">
+
+    <label for="cantidad">¿Cuántas unidades de tiempo deseas reservar?</label>
+    <input type="range" id="cantidad" min="1" max="50" value="1">
+    <div class="valor-seleccionado" id="valorSeleccionado">1</div>
+
+    <button class="boton-confirmar" onclick="confirmarReserva()">Confirmar Reserva</button>
+    <div class="mensaje-confirmacion" id="mensajeConfirmacion"></div>
+    <button class="boton-reset" onclick="resetReserva()">Hacer otra reserva</button>
+  </div>
+
+  <div class="footer">Reserva sin fines comerciales solo recreacionales</div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var rangeInput = document.getElementById('cantidad');
+      var valorTexto = document.getElementById('valorSeleccionado');
+      var fechaInput = document.getElementById('fecha');
+
+      rangeInput.addEventListener('input', function () {
+        valorTexto.textContent = rangeInput.value;
+      });
+
+      var hoy = new Date().toISOString().split("T")[0];
+      fechaInput.setAttribute("min", hoy);
+    });
+
+    function confirmarReserva() {
+      var cantidad = document.getElementById('cantidad').value;
+      var fecha = document.getElementById('fecha').value;
+      var mensaje = document.getElementById('mensajeConfirmacion');
+
+      if (!fecha) {
+        mensaje.textContent = '⚠️ Por favor selecciona una fecha antes de confirmar.';
+        mensaje.style.backgroundColor = '#fff3cd';
+        mensaje.style.borderLeft = '4px solid #ffc107';
+      } else {
+        mensaje.textContent = '✅ Has reservado ' + cantidad + ' unidades de tiempo para el día ' + fecha + '. ¡Gracias por tu reserva!';
+        mensaje.style.backgroundColor = '#e6f0ff';
+        mensaje.style.borderLeft = '4px solid #3483fa';
+      }
+    }
+
+    function resetReserva() {
+      document.getElementById('cantidad').value = 1;
+      document.getElementById('fecha').value = '';
+      document.getElementById('valorSeleccionado').textContent = '1';
+      document.getElementById('mensajeConfirmacion').textContent = '';
+      document.getElementById('mensajeConfirmacion').style.backgroundColor = '';
+      document.getElementById('mensajeConfirmacion').style.borderLeft = '';
+    }
+  </script>
+</body>
+</html>
