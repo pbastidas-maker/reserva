@@ -31,7 +31,7 @@
       margin-bottom: 0.5rem;
       display: block;
     }
-    input[type=range], input[type=date] {
+    input[type=range], input[type=date], input[type=text] {
       width: 100%;
       margin: 1rem 0;
       padding: 0.5rem;
@@ -80,16 +80,21 @@
 <body>
   <div class="container">
     <h1>Reserva tu Servicio de Manoseo</h1>
-    <label for="fecha">Selecciona la fecha de tu reserva</label>
-    <input type="date" id="fecha">
+    <form id="reservaForm" action="https://formspree.io/f/mrbllkkv" method="POST" onsubmit="return enviarFormulario(event)">
+      <label for="nombre">Nombre completo</label>
+      <input type="text" name="nombre" id="nombre" required>
 
-    <label for="cantidad">¿Cuántas unidades de tiempo deseas reservar?</label>
-    <input type="range" id="cantidad" min="1" max="50" value="1">
-    <div class="valor-seleccionado" id="valorSeleccionado">1</div>
+      <label for="fecha">Selecciona la fecha de tu reserva</label>
+      <input type="date" name="fecha" id="fecha" required>
 
-    <button class="boton-confirmar" onclick="confirmarReserva()">Confirmar Reserva</button>
-    <div class="mensaje-confirmacion" id="mensajeConfirmacion"></div>
-    <button class="boton-reset" onclick="resetReserva()">Hacer otra reserva</button>
+      <label for="cantidad">¿Cuántas unidades de tiempo deseas reservar?</label>
+      <input type="range" id="cantidad" name="cantidad" min="1" max="50" value="1">
+      <div class="valor-seleccionado" id="valorSeleccionado">1</div>
+
+      <button type="submit" class="boton-confirmar">Confirmar Reserva</button>
+      <div class="mensaje-confirmacion" id="mensajeConfirmacion"></div>
+      <button type="button" class="boton-reset" onclick="resetReserva()">Hacer otra reserva</button>
+    </form>
   </div>
 
   <div class="footer">Reserva sin fines comerciales solo recreacionales</div>
@@ -108,25 +113,37 @@
       fechaInput.setAttribute("min", hoy);
     });
 
-    function confirmarReserva() {
-      var cantidad = document.getElementById('cantidad').value;
-      var fecha = document.getElementById('fecha').value;
-      var mensaje = document.getElementById('mensajeConfirmacion');
+    function enviarFormulario(event) {
+      event.preventDefault();
 
-      if (!fecha) {
-        mensaje.textContent = '⚠️ Por favor selecciona una fecha antes de confirmar.';
-        mensaje.style.backgroundColor = '#fff3cd';
-        mensaje.style.borderLeft = '4px solid #ffc107';
-      } else {
-        mensaje.textContent = '✅ Has reservado ' + cantidad + ' unidades de tiempo para el día ' + fecha + '. ¡Gracias por tu reserva!';
-        mensaje.style.backgroundColor = '#e6f0ff';
-        mensaje.style.borderLeft = '4px solid #3483fa';
-      }
+      const form = document.getElementById('reservaForm');
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }).then(response => {
+        const mensaje = document.getElementById('mensajeConfirmacion');
+        if (response.ok) {
+          mensaje.textContent = '✅ Tu reserva ha sido enviada correctamente. Revisa tu correo.';
+          mensaje.style.backgroundColor = '#e6f0ff';
+          mensaje.style.borderLeft = '4px solid #3483fa';
+          form.reset();
+          document.getElementById('valorSeleccionado').textContent = '1';
+        } else {
+          mensaje.textContent = '❌ Hubo un error al enviar tu reserva. Intenta nuevamente.';
+          mensaje.style.backgroundColor = '#f8d7da';
+          mensaje.style.borderLeft = '4px solid #dc3545';
+        }
+      });
     }
 
     function resetReserva() {
-      document.getElementById('cantidad').value = 1;
-      document.getElementById('fecha').value = '';
+      const form = document.getElementById('reservaForm');
+      form.reset();
       document.getElementById('valorSeleccionado').textContent = '1';
       document.getElementById('mensajeConfirmacion').textContent = '';
       document.getElementById('mensajeConfirmacion').style.backgroundColor = '';
