@@ -11,20 +11,30 @@
       font-family: 'Roboto', sans-serif;
       background-color: #f5f5f5;
       color: #333;
+      padding: 1rem;
     }
     .container {
+      width: 100%;
       max-width: 500px;
       margin: 0 auto;
       padding: 2rem;
       background: #fff;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
-      margin-top: 3rem;
+      margin-top: 2rem;
     }
     h1 {
       color: #3483fa;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    h1::before {
+      content: "🗓️";
+      font-size: 1.6rem;
     }
     label {
       font-weight: 700;
@@ -34,16 +44,17 @@
     input[type=range], input[type=date], input[type=text] {
       width: 100%;
       margin: 1rem 0;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-size: 1rem;
+      box-sizing: border-box;
     }
     .valor-seleccionado {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       color: #3483fa;
       font-weight: bold;
-      text-align: center;
+      text-align: right;
     }
-    .boton-confirmar, .boton-reset {
+    .boton-confirmar, .boton-reset, .boton-imprimir {
       display: block;
       width: 100%;
       padding: 1rem;
@@ -57,7 +68,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    .boton-confirmar:hover, .boton-reset:hover {
+    .boton-confirmar:hover, .boton-reset:hover, .boton-imprimir:hover {
       background-color: #2968c8;
     }
     .mensaje-confirmacion {
@@ -72,8 +83,19 @@
     .footer {
       text-align: center;
       margin-top: 2rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #aaa;
+    }
+    @media screen and (max-width: 600px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+      .container {
+        padding: 1.5rem;
+      }
+      .valor-seleccionado {
+        font-size: 1.2rem;
+      }
     }
   </style>
 </head>
@@ -91,8 +113,9 @@
       <input type="range" id="cantidad" name="cantidad" min="1" max="50" value="1">
       <div class="valor-seleccionado" id="valorSeleccionado">1</div>
 
-      <button type="submit" class="boton-confirmar">Confirmar Reserva</button>
+      <button type="submit" class="boton-confirmar" id="botonConfirmar">Confirmar Reserva</button>
       <div class="mensaje-confirmacion" id="mensajeConfirmacion"></div>
+      <button type="button" class="boton-imprimir" onclick="window.print()">Imprimir Confirmación</button>
       <button type="button" class="boton-reset" onclick="resetReserva()">Hacer otra reserva</button>
     </form>
   </div>
@@ -118,6 +141,10 @@
 
       const form = document.getElementById('reservaForm');
       const formData = new FormData(form);
+      const boton = document.getElementById('botonConfirmar');
+
+      boton.disabled = true;
+      boton.textContent = 'Enviando...';
 
       fetch(form.action, {
         method: 'POST',
@@ -127,8 +154,11 @@
         }
       }).then(response => {
         const mensaje = document.getElementById('mensajeConfirmacion');
+        boton.disabled = false;
+        boton.textContent = 'Confirmar Reserva';
+
         if (response.ok) {
-          mensaje.textContent = '✅ Tu reserva ha sido enviada correctamente. Revisa tu correo.';
+          mensaje.textContent = `✅ ${formData.get('nombre')}, tu reserva para el día ${formData.get('fecha')} por ${formData.get('cantidad')} unidades de tiempo ha sido enviada correctamente. Revisa tu correo.`;
           mensaje.style.backgroundColor = '#e6f0ff';
           mensaje.style.borderLeft = '4px solid #3483fa';
           form.reset();
